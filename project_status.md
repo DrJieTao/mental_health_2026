@@ -4,7 +4,6 @@
 **Date**: 2026-03-18
 **Phase**: Phase 1 — Decision-Review Agent Loop (in progress)
 **Target Venues**: HICSS, Information Systems Research, Information Systems Frontiers
-**Funding**: Robert E. Wall Faculty Award (2025–2026)
 
 **Summary**: This study introduces a two-agent LLM architecture for mental health classification on social media. A Decision Agent classifies Reddit posts using structured clinical reasoning, while a Review Agent audits both the classification outcome and the reasoning process, delivering Socratic feedback that drives iterative improvement. A two-pass batch pipeline screens all posts cheaply, then curates the most clinically important cases for deeper multi-round analysis. Evaluated on the ANGST dataset (2,876 gold-labeled Reddit posts, 4-class), the system is designed to demonstrate that structured inter-agent feedback with process compliance enforcement improves classification accuracy and consistency over single-agent baselines — without fine-tuning.
 
