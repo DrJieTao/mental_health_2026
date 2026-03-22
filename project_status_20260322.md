@@ -323,6 +323,8 @@ Not all findings map equally well to the failure mode taxonomy. This assessment 
 
 #### What the Paper Could Look Like
 
+**Draft Outline**: [HERE](https://github.com/DrJieTao/mental_health_2026/blob/main/dark_side_paper_outline_v0.md)
+
 **Title direction**: *"When the Reviewer Becomes the Problem: Failure Modes in Multi-Agent Reasoning Process Auditing for Mental Health Classification"*
 
 **Four core contributions**: (1) Process-outcome audit paradox; (2) Specification gaming in agent prompts; (3) Confidence-feedback blind spot; (4) Cross-class collateral damage.
