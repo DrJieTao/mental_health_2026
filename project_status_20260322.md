@@ -287,7 +287,7 @@ The pilot study produced both architecture validation and rich failure mode evid
 - **Analytical framework**: Failure mode taxonomy from multi-agent computational psychiatry literature
 - **Framing**: Pilot study as a case study surfacing *architectural* failure modes in clinical AI
 - **Strengths**: Failure modes are genuine and empirically documented (not hypothetical); "dark side" framing turns weaknesses into the contribution; directly addresses a gap — most multi-agent MH papers report successes, failure mode analysis is scarce; HICSS minitrack is a natural fit (DA-RA collaboration failures are literally human-agent collaboration failures)
-- **Weaknesses**: Requires careful framing to avoid "our system doesn't work" perception; architecture novelty becomes secondary; Wall Award deliverable alignment needs verification; some failure mode mappings are stronger than others (see assessment below)
+- **Weaknesses**: Requires careful framing to avoid "our system doesn't work" perception; architecture novelty becomes secondary; Final deliverable alignment needs verification; some failure mode mappings are stronger than others (see assessment below)
 
 #### Critically Assessed Finding-to-Failure-Mode Mappings
 
@@ -320,7 +320,6 @@ Not all findings map equally well to the failure mode taxonomy. This assessment 
 1. **Sample size**: 100 posts, 1 dataset, 1 model. Counter: the strong findings are *architectural* (emerge from system structure, not implementation) and would occur in any system with the same design patterns.
 2. **Source quality**: The failure mode literature review includes some non-peer-reviewed sources. HICSS submission requires replacing these with peer-reviewed equivalents.
 3. **Perception risk**: System macro F1 = 0.450, below published baselines (67.4%). Narrative must be: "the failure modes are the contribution, not the system's performance."
-4. **Wall Award alignment**: A "dark side" paper may or may not fulfill the deliverable. This should be checked against the award criteria.
 
 #### What the Paper Could Look Like
 
@@ -350,7 +349,7 @@ Not all findings map equally well to the failure mode taxonomy. This assessment 
 ### Decision Criteria for Collaborators
 
 1. Do the 4 strong architectural failure modes constitute a sufficient standalone contribution for HICSS?
-2. Does the "dark side" framing serve or undermine the Wall Award deliverable?
+2. Does the "dark side" framing serve or undermine the final deliverable?
 3. Is the mapping to established frameworks (TED, Constrained Process Maps, FAITA-MH) strong enough for peer review given a 100-post pilot?
 4. Would collaborators prefer to contribute domain expertise to a failure analysis or an architecture evaluation?
 5. What is the preferred publication sequence if both papers are pursued?
