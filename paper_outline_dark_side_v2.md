@@ -12,9 +12,9 @@
 
 **Paragraph 1 — The Reasoning Paradox** (~100 words): Open with: structured reasoning (CoT, ToT) improves accuracy in 86.3% of LLM-clinical task pairs but also introduces hallucination, omission, and reasoning drift (arXiv:2509.21933). Reasoning models improve accuracy ~3% but reduce consistency — 84% vs 91% (Springer, 2026). Multi-agent review was proposed as the answer. We show it introduces its own failure modes.
 
-**Paragraph 2 — The Multi-Agent Promise and the Empirical Gap** (~200 words): Process-level review reduces incorrect knowledge by 63% (Process vs. Outcome Review, 2025). Agent-based mental health systems are "emerging but underexplored" (MDPI 2026, Ge et al. 2025). No prior work has systematically characterized what goes wrong inside a real multi-agent clinical AI system. Gap: the field lacks empirical failure mode catalogs from deployed systems.
+**Paragraph 2 — The Multi-Agent Promise and Its Limits** (~200 words): Process-level review reduces incorrect knowledge by 63% (Process vs. Outcome Review, 2025) — strong motivation for multi-agent designs. MAST (Cemri et al., NeurIPS 2025) provides the best existing failure taxonomy: 14 modes from 1,600+ traces across 7 frameworks. But MAST catalogs execution-level failures (did agents follow instructions?); it does not address reasoning-level failures (does following instructions produce correct outcomes?) or system-level emergent effects. Four of our seven failure modes fall outside MAST's scope.
 
-**Paragraph 3 — This Paper** (~200 words): Seven failure modes from 30 sessions of systematic probing of a Decision-Review architecture for mental health classification on social media (ANGST dataset, 100 posts, 5 replicate runs per condition). Three architectural scopes: single-agent (FM-1, FM-4, FM-7), multi-agent interaction (FM-2, FM-3), system-level (FM-5, FM-6). Each yields a design principle. The principles converge on a common requirement: externalized, structured clinical knowledge.
+**Paragraph 3 — This Paper** (~200 words): Seven failure modes from 30 sessions of systematic probing of a Decision-Review architecture for mental health classification on social media (ANGST dataset, 100 posts, 5 replicate runs per condition). Three architectural scopes: single-agent (FM-1, FM-4, FM-7), multi-agent interaction (FM-2, FM-3), system-level (FM-5, FM-6). Our contribution fills three compounding gaps: the coverage gap (4/7 FMs outside MAST), the theory-evidence gap (Goodhart, calibration, scaffolding interference — studied in isolation, here shown interacting in one system), and the domain gap (no failure catalog for clinical multi-agent AI). Each FM yields a design principle; the principles converge on externalized, structured clinical knowledge.
 
 **Paragraph 4 — Paper Organization** (~100 words): Standard roadmap. Organizing principle: from failure observation to generalizable principle.
 
@@ -126,33 +126,38 @@ The primary evaluation is a three-condition ablation isolating each architectura
 
 ## §5. Failure Mode Analysis (~3,200 words)
 
-**Table 2**: FM Summary
+MAST (Cemri et al., NeurIPS 2025) provides the most comprehensive existing failure taxonomy: 14 modes across 3 categories, validated on 1,600+ traces. Our Table 2 extends MAST with seven failure modes from clinical multi-agent classification — four entirely outside MAST's scope, three overlapping but refined with domain-specific evidence.
 
-| FM | Name | Scope | Theoretical Construct | Design Principle |
-|----|------|-------|-----------------------|-----------------|
-| FM-1 | Overconfident Single-Pass Classification | Single-agent | Reflexion / self-correction | External knowledge grounding required |
-| FM-4 | Specification Gaming | Single-agent | Rule conflict exploitation | Mandatory steps must be immune to optional exits |
-| FM-7 | Architectural Complexity Overhead | Single-agent | Scaffolding tax / XAI tradeoff | Externalize reasoning into knowledge stores |
-| FM-2 | Process-Outcome Audit Paradox | Multi-agent | Goodhart's Law | Process rules must encode discriminative criteria |
-| FM-3 | Confidence-Feedback Blind Spot | Multi-agent | Confidence calibration | Feedback activation must decouple confidence from correctness |
-| FM-5 | Cross-Class Collateral Damage | System-level | Shared prompt coupling | Class-specific reasoning paths required |
-| FM-6 | Generic Knowledge Pooling Ceiling | System-level | Knowledge retrieval limits | Per-instance retrieval beyond batch calibration |
+**Table 2**: FM Summary (extends MAST)
+
+| FM | Name | Scope | §2.2 Construct | MAST Relation | Design Principle |
+|----|------|-------|----------------|---------------|-----------------|
+| FM-1 | Overconfident Single-Pass Classification | Single-agent | Calibration gap (Chhikara 2025) | Outside MAST | External knowledge grounding |
+| FM-4 | Specification Gaming | Single-agent | Extremal Goodhart (ICLR 2024) | Maps to FC1.1 | Mandatory steps immune to optional exits |
+| FM-7 | Architectural Complexity Overhead | Single-agent | Scaffolding interference (Sprague 2024) | Extends FC2.6 | Externalize reasoning into knowledge stores |
+| FM-2 | Process-Outcome Audit Paradox | Multi-agent | Causal Goodhart (ICLR 2024) | Extends FC3.3 | Discriminative criteria in process rules |
+| FM-3 | Confidence-Feedback Blind Spot | Multi-agent | Calibration gap (Chhikara 2025) | Outside MAST | Decouple confidence from correctness |
+| FM-5 | Cross-Class Collateral Damage | System-level | Domain-specific emergent | Outside MAST | Class-specific reasoning paths |
+| FM-6 | Generic Knowledge Pooling Ceiling | System-level | Domain-specific emergent | Outside MAST | Per-instance retrieval |
 
 ### 5.1 Where Self-Correction Fails (~1,000 words)
 
 **FM-1: Overconfident Single-Pass Classification** (~450 words)
 - What: 95–99% of posts terminate via CONFIDENCE_THRESHOLD despite accuracy 0.34–0.36. DA performs the form of deliberation without the substance.
-- Evidence: EXP-008 C1 ablation (5 runs, Gemma): mean F1=0.368, SD=0.025. U-shape rate 2–5% (confidence guard prevents original pattern). EXP-007 nano-model: 91.9% U-shaped confidence. Cross-backbone confirmed (F-043, F-050, F-057).
+- §2.2 construct: Instance of the confidence calibration gap (Chhikara, TMLR 2025) — structured, non-random miscalibration operating within a clinical multi-agent pipeline. Outside MAST scope (no confidence variable in MAST's 14 modes).
+- Evidence: EXP-008 C1 ablation (5 runs, Gemma): mean F1=0.368, SD=0.025. 0 posts entered Pass 2. U-shape rate 2–5% (confidence guard prevents original pattern). Cross-backbone confirmed (F-043, F-050, F-057).
 - Design Principle (DP-1): Single-agent self-correction is insufficient. External knowledge grounding required.
 
 **FM-7: Architectural Complexity Overhead** (~400 words)
 - What: Tool-use scaffold imposes overhead that can interfere with native reasoning. Baseline F1=0.643 vs DA F1=0.368 on Gemma (27.5pp gap); negligible on Gemini (-0.006).
+- §2.2 construct: Instance of scaffolding interference (Sprague et al. 2024, NeurIPS 2024 noisy CoT). Extends MAST FC2.6 (reasoning-action mismatch) by identifying a deeper mechanism: the scaffold degrades reasoning quality below the unscaffolded baseline.
 - Evidence: Cross-backbone interaction effect (F-056, F-057, F-044). RA v9→v10 redesign: 97%→0% parse failure (F-055). Gemma 4 is a native reasoning model with `<|think|>` mode (Google 2026). Sprague et al. 2024: CoT reduces accuracy up to 36.3% when deliberation is counterproductive.
 - XAI tradeoff: Scaffold provides interpretability at the cost of performance — same tradeoff at prompt architecture level. Open question: how to design scaffolds that complement rather than compete with native reasoning.
 - Design Principle (DP-7): Externalize reasoning complexity into knowledge stores. Separate reasoning from memory.
 
 **FM-4: Specification Gaming** (~300 words, Identified/Closed)
 - What: DA exploited conflicting prompt rules to skip mandatory iterations (10/10 posts).
+- §2.2 construct: Extremal Goodhart (ICLR 2024). Maps to MAST FC1.1 (disobey task specification) — confirms MAST in clinical domain.
 - Evidence: EXP-003. Resolved with DA v5.2 (D22), validated in EXP-003c.
 - Design Principle: Mandatory steps must be immune to co-present optional exits.
 
@@ -160,11 +165,13 @@ The primary evaluation is a three-condition ablation isolating each architectura
 
 **FM-2: Process-Outcome Audit Paradox** (~500 words)
 - What: process_valid_rate=0.980 while Normal F1=0.300. RA optimizes for compliance over correctness.
+- §2.2 construct: Causal Goodhart (ICLR 2024) — process compliance is downstream of quality, not causally upstream. Extends MAST FC3.3 (incorrect verification): our verifier works correctly but verifies the wrong thing.
 - Evidence: EXP-008 C2 ablation: 66 posts enter Pass 2, 5 corrections (7.6%), 0 regressions. RA correctly diagnosed all 21 misclassified Normal posts (F-026) but feedback had minimal corrective effect. Class-asymmetric: Comorbid correction 45% vs Normal 7% (LL-036).
 - Design Principle (DP-2): Process rules must encode discriminative criteria, not generic compliance checks.
 
 **FM-3: Confidence-Feedback Blind Spot** (~400 words)
 - What: High-confidence wrong predictions structurally bypass correction.
+- §2.2 construct: Same calibration gap as FM-1 (Chhikara 2025), but at the multi-agent level. FM-1 = calibration prevents self-correction; FM-3 = calibration creates a structural blind spot in the review loop. Outside MAST scope (no conditional review activation in MAST's 14 modes).
 - Evidence: Structural blind spot addressed by D32 bypass_confidence_guard (Pass 2 activation 63%). Residual: DA receives feedback but maintains prediction in 92.4% of Pass 2 posts. max_rounds=1 → 0% correction; max_rounds=2 → 7.6% correction (round-dependent resistance, LL-037).
 - Design Principle (DP-3): Feedback activation must decouple confidence from correctness.
 
@@ -172,15 +179,19 @@ The primary evaluation is a three-condition ablation isolating each architectura
 
 **FM-5: Cross-Class Collateral Damage** (~350 words)
 - What: Depression/Normal boundary check improved Normal +0.086 but regressed Comorbid -0.061.
+- Outside MAST scope (trace-level analysis cannot detect label-level cross-class coupling). Domain-specific emergent effect from clinical vocabulary overlap (§2.3).
 - Evidence: EXP-004 S22 (F-042, LL-032). C1 ablation per-class variance: Normal consistently lowest (mean 0.187), Comorbid depressed relative to other clinical classes.
 - Design Principle (DP-5): In shared-reasoning systems, class-specific corrections propagate to adjacent classes. Class-specific reasoning paths required.
 
 **FM-6: Generic Knowledge Pooling Ceiling** (~450 words)
 - What: Pool improved Anxiety ΔF1=+0.143, Comorbid ΔF1=+0.129, Normal ΔF1=0.000.
+- Outside MAST scope (no knowledge management dimension; MAST's modes are observable within single traces, FM-6 requires cross-batch observation). Domain-specific: Normal/clinical boundary ambiguity (§2.3) is where pooling fails.
 - Evidence: EXP-004 D37 (F-040). C3 probe: no accumulation effect (first half 22.2% ≈ second half 21.4%, F-054). Zero-shot ceiling confirmed after 6 DA + 4 RA versions (F-041).
 - Design Principle (DP-6): Generic pooling has a resolution limit below which per-instance retrieval is required.
 
 ### 5.4 Ablation Summary and Design Principles (~500 words)
+
+The ablation results map onto the three gaps from §2: Baseline→C1 reveals FM-1 and FM-7 (coverage gap — outside MAST). C1→C2 provides evidence for Causal Goodhart and calibration gap operating in one system (theory-evidence gap). FM-5 and FM-6 are observable in per-class breakdowns across all conditions (domain gap — emergent effects of mental health boundary ambiguity).
 
 **Table 3**: EXP-008 Ablation Results (Gemma 4 E4B, temp=0.3, 5 runs × 100 posts)
 
@@ -208,11 +219,12 @@ The primary evaluation is a three-condition ablation isolating each architectura
 ## §6. Discussion (~1,250 words)
 
 ### 6.1 Research Implications (~500 words)
-- Cross-backbone validation: FM-1 confirmed on both (Gemini, Gemma). FM-7 requires cross-backbone comparison. Qwen3.5-2B rejection confirms capability floor.
+- Cross-backbone validation extends MAST's generalizability: MAST validated on general-purpose frameworks with frontier models; we validate on local clinical models under privacy constraints. FM-1 confirmed backbone-independent. FM-7 shows capability-dependent magnitude (a dimension MAST does not capture). Qwen3.5-2B rejection confirms capability floor.
 - Generalizability beyond mental health: each FM generalizes to any multi-agent clinical AI.
 - Reasoning–memory separation: FM-7/DP-7 connects to the emerging paradigm. Clinical knowledge should not live in prompts; it should live in external structured stores.
 
 ### 6.2 Practitioner Implications (~500 words)
+- Execution-level taxonomies like MAST do not capture the operational realities below. These are complementary practitioner-facing findings.
 - Reliability: parse failure stochasticity, per-post error isolation, silent output truncation.
 - Prompt complexity cliff: hard threshold per model tier (RA v9→v10).
 - Feedback loops: round resistance (LL-037), class-asymmetric correction (LL-036), confidence guard design tension (F-051).
@@ -220,13 +232,13 @@ The primary evaluation is a three-condition ablation isolating each architectura
 - Temperature as experimental precondition: temp=0.0 → deterministic; temp=0.3 → valid variance.
 
 ### 6.3 Convergent Design Requirements for External Clinical Knowledge (~250 words)
-Seven DPs converge on: externalized, structured clinical knowledge, retrievable per-instance, auditable independently. Specific artifact form is an open research question. Directions: clinical ontology structuring for retrieval, class-specific subgraph traversal, scaffold-free knowledge injection. Our FMs provide concrete evaluation criteria for any proposed architecture.
+Seven DPs converge on: externalized, structured clinical knowledge, retrievable per-instance, auditable independently — addressing both the MAST coverage gap (§2.1) and the theoretical construct gaps (§2.2). Specific artifact form is an open research question. Directions: clinical ontology structuring for retrieval, class-specific subgraph traversal, scaffold-free knowledge injection. Our FMs provide concrete evaluation criteria for any proposed architecture.
 
 ---
 
 ## §7. Conclusion (~400 words)
 
-**Paragraph 1 — Contributions**: Seven failure modes, three levels, 30 sessions. Each yields a design principle converging on externalized clinical knowledge. "Not safer by virtue of more agents — safer when each interaction point is designed with awareness of how it can fail."
+**Paragraph 1 — Contributions**: Extends MAST (Cemri et al., NeurIPS 2025) into clinical mental health classification. Seven failure modes, three levels, 30 sessions. Three gaps addressed: coverage (4/7 outside MAST), theory-evidence (Goodhart, calibration, scaffolding interference interacting in one system), domain (first clinical multi-agent failure catalog). Each yields a design principle converging on externalized clinical knowledge. "Not safer by virtue of more agents — safer when each interaction point is designed with awareness of how it can fail."
 
 **Paragraph 2 — Limitations**: Pilot study. 100 posts, single dataset, 4B local model (privacy-motivated). Cross-backbone validation on two additional models. Oracle-aided Pass 2 gate. Zero-shot configuration. Boundaries define where next investigation should push. FMs and DPs offered as testable hypotheses.
 
