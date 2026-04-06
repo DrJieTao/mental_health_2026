@@ -52,7 +52,7 @@ Theoretical constructs that explain the mechanisms MAST does not address. Each t
 - NeurIPS 2024 noisy CoT — external reasoning degrades native reasoning when introducing noise.
 - Gemma 4 as native reasoning model (Google 2026). XAI explainability-performance tradeoff at prompt architecture level.
 
-**Gap**: These constructs have been studied in isolation. No prior work examines how they interact within a single multi-agent system — where calibration failure feeds audit paradox, compounded by confidence gating, within a shared prompt space.
+**Gap**: These constructs have been studied in isolation. No prior work examines how they interact within a single multi-agent system — where calibration failure feeds audit paradox, compounded by confidence gating, within a shared prompt space. Testing these interactions requires an ablation design that isolates each architectural layer's contribution: single-agent baseline, multi-agent review, and system-level knowledge accumulation.
 
 ### 2.3 Mental Health AI at the Agent Frontier (~400 words)
 
@@ -66,7 +66,7 @@ The domain where these theoretical mechanisms are most consequential.
 
 **Gap**: The domain has frameworks, benchmarks, and single-model baselines. It lacks the diagnostic vocabulary for what goes wrong when these are assembled into multi-agent architectures.
 
-**Three gaps compose into the contribution**: coverage gap (2.1) + theory-evidence gap (2.2) + domain gap (2.3) = "We extend the best existing failure taxonomy by grounding previously theoretical constructs in the first empirical evidence from a clinical multi-agent system."
+**Three gaps compose into the contribution**: coverage gap (2.1) + theory-evidence gap (2.2) + domain gap (2.3) = "We extend the best existing failure taxonomy by grounding previously theoretical constructs in the first empirical evidence from a clinical multi-agent system." To bridge these gaps, we design a controlled ablation study (§4) with four conditions that systematically isolate each architectural layer — testing each failure mode's theoretical mechanism against empirical evidence rather than relying on post-hoc observation alone.
 
 ---
 
@@ -83,7 +83,7 @@ Decision Agent (DA): 3-iteration evaluate_signal with mandatory Devil's Advocate
 Ground each choice in literature: mandatory DA (ChatEval), external RA audit (Process vs. Outcome Review), two-pass adaptive depth (CriticBench saturation), cross-batch curation (PAMAS information drowning).
 
 ### 3.3 The Curation Pipeline as Proto-Knowledge-Retrieval (200 words)
-Frame pool as a precursor to structured knowledge retrieval. FM-6 reveals where it succeeds and where it fails.
+Frame pool as a precursor to structured knowledge retrieval. FM-6 reveals where it succeeds and where it fails. Note: the architecture is modular by design — each component (RA, pool injection) can be independently disabled, enabling the controlled ablation in §4 that isolates each layer's contribution to both performance and failure modes.
 
 ---
 
@@ -96,7 +96,7 @@ Dataset: ANGST (Hengle et al. EMNLP 2024), 4-class, 100-post stratified test sam
 
 ### 4.2 Ablation Design (500 words)
 
-Brief context: The seven failure modes were first identified through iterative development across four prior experiment phases on Gemini Flash Lite (mechanical validation → nano-model structural analysis → live specification gaming discovery → full-scale taxonomy). This development history informed the ablation design described here; details are available in the supplementary materials.
+The theoretical constructs in §2.2 — metric gaming, calibration failure, scaffolding interference — predict specific failure mechanisms but lack empirical evidence from working multi-agent systems. The ablation study below was designed to produce that evidence: each condition isolates an architectural layer, and each pairwise comparison tests a specific FM cluster. The seven failure modes were first identified through iterative development across four prior phases on Gemini Flash Lite; this history informed the ablation design. Details are available in the supplementary materials.
 
 The primary evaluation is a three-condition ablation isolating each architectural layer's contribution. All conditions share: Gemma 4 E4B backbone, temp=0.3, 100 posts (25/class, ANGST test split, seed=42), 5 replicate runs per condition.
 
@@ -126,7 +126,7 @@ The primary evaluation is a three-condition ablation isolating each architectura
 
 ## §5. Failure Mode Analysis (~3,200 words)
 
-MAST (Cemri et al., NeurIPS 2025) provides the most comprehensive existing failure taxonomy: 14 modes across 3 categories, validated on 1,600+ traces. Our Table 2 extends MAST with seven failure modes from clinical multi-agent classification — four entirely outside MAST's scope, three overlapping but refined with domain-specific evidence.
+Section 2 identified three theoretical gaps; Section 4 designed an ablation to test them empirically. This section presents the results: seven failure modes, each grounded in a §2.2 theoretical construct and evidenced through the §4 ablation. MAST (Cemri et al., NeurIPS 2025) provides the baseline taxonomy (14 modes, 1,600+ traces). Our Table 2 extends MAST with seven failure modes from clinical multi-agent classification — four entirely outside MAST's scope, three overlapping but refined with domain-specific evidence.
 
 **Table 2**: FM Summary (extends MAST)
 
