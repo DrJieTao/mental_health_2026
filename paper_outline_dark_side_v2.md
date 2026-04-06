@@ -92,7 +92,7 @@ Frame pool as a precursor to structured knowledge retrieval. FM-6 reveals where 
 ### 4.1 Local Model Selection and Evaluation Protocol (250 words)
 **Why local models**: (1) Privacy — sensitive clinical text stays local; (2) Reproducibility — fixed weights, no silent API updates; (3) Experimental control — full parameter transparency, enables sensitivity analysis. Primary: Gemma 4 E4B (Q6_K, Apple Silicon 64 GB). Cross-backbone validation in §6.
 
-Dataset: ANGST (Hengle et al. EMNLP 2024), 4-class, 100-post stratified test sample (25/class, seed=42). Important: "Normal" is post-level temporal judgment, not population-level health claim — all users self-disclosed clinical history. Metrics: per-class F1, macro F1, Pass 2 correction rate, parse failure rate.
+Dataset: ANGST (Hengle et al. EMNLP 2024), 4-class, 100-post stratified sample from the **test split** (25/class, seed=42). Critical: the test split (2,872 posts) is the gold-standard set annotated by three expert psychologists working independently, with inter-annotator agreement measured via Krippendorff's alpha and Fleiss kappa. The training split (6,900 posts) is ANGST-Silver — labeled by GPT-3.5-turbo, not human experts. We exclusively use the expert-labeled test split to ensure our failure mode analysis is evaluated against professional clinical judgment, not LLM-generated labels. Important: "Normal" is a post-level temporal judgment, not population-level health claim — all users self-disclosed clinical history. Metrics: per-class F1, macro F1, Pass 2 correction rate, parse failure rate.
 
 ### 4.2 Ablation Design (500 words)
 
@@ -113,7 +113,7 @@ The primary evaluation is a three-condition ablation isolating each architectura
 - Baseline → C1: Does structured reasoning help or hurt? (FM-7)
 - C1 → C2: Does adding a review agent improve classification? (FM-2, FM-3)
 - C2 → C3: Does accumulated cross-batch knowledge help? (FM-6)
-- FM-5 (cross-class collateral) is observable in per-class breakdowns across all conditions.
+- FM-5 (cross-class collateral) is **not isolated by any pairwise comparison**. It is a shared-prompt-space effect that manifests within every condition — observable through per-class F1 breakdowns (e.g., Normal improvements co-occurring with Comorbid regressions) rather than across-condition deltas. The ablation confirms its presence but cannot attribute it to a single architectural layer, because the shared prompt space is constant across all conditions. Primary evidence for FM-5 comes from the development history (DA v5.5→v5.6: Normal +0.086, Comorbid -0.061) rather than the ablation itself.
 - FM-4 (specification gaming) was resolved prior to this ablation and is reported as an identified/closed failure mode.
 
 **Pass 2 design**: Posts enter Pass 2 if the RA identifies them as wrong (`outcome_match=false`) or having reasoning gaps. In Pass 2, the DA receives RA feedback and gets two rounds (max_rounds=2): Round 0 with RA review, Round 1 with RA feedback but no final RA call. This design was determined empirically — single-round Pass 2 (max_rounds=1) produced zero corrections due to the DA's first-round feedback resistance.
@@ -180,7 +180,7 @@ Section 2 identified three theoretical gaps; Section 4 designed an ablation to t
 **FM-5: Cross-Class Collateral Damage** (~350 words)
 - What: Depression/Normal boundary check improved Normal +0.086 but regressed Comorbid -0.061.
 - Outside MAST scope (trace-level analysis cannot detect label-level cross-class coupling). Domain-specific emergent effect from clinical vocabulary overlap (§2.3).
-- Evidence: EXP-004 S22 (F-042, LL-032). C1 ablation per-class variance: Normal consistently lowest (mean 0.187), Comorbid depressed relative to other clinical classes.
+- Evidence: Primary evidence from development history (EXP-004 S22, F-042, LL-032): DA v5.6 boundary check improved Normal +0.086 but regressed Comorbid -0.061. Ablation confirms the pattern in C1 per-class variance (Normal consistently lowest at mean 0.187, Comorbid depressed relative to Depression and Anxiety) but does not isolate FM-5 via condition comparison — the shared prompt space is constant across all conditions. This is a limitation: FM-5 is the one failure mode our ablation design documents but cannot causally attribute through controlled comparison.
 - Design Principle (DP-5): In shared-reasoning systems, class-specific corrections propagate to adjacent classes. Class-specific reasoning paths required.
 
 **FM-6: Generic Knowledge Pooling Ceiling** (~450 words)
